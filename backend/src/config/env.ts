@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { z } from "zod";
 
 const schema = z.object({
@@ -18,4 +19,3 @@ const schema = z.object({
 });
 export type Config = z.infer<typeof schema>;
 export const config = schema.parse(process.env);
-
