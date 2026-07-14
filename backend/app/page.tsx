@@ -1,0 +1,1 @@
+export default function Home(){return <main><h1>Nas Hub</h1><p>Secure server monitoring is running.</p><section><h2>Native-first monitoring</h2><p>The iOS application is the primary dashboard. The web dashboard foundation will expand in a later release.</p><a href="/api/v1/system/health">Check backend health</a></section></main>}

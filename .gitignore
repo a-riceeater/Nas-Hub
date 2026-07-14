@@ -1,0 +1,10 @@
+backend/node_modules/
+backend/.next/
+backend/dist/
+backend/data/*.sqlite*
+backend/.env
+*.tsbuildinfo
+*.p8
+xcuserdata/
+DerivedData/
+.DS_Store

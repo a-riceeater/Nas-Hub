@@ -1,0 +1,3 @@
+import SwiftUI
+struct SettingsView:View{@EnvironmentObject var app:AppState;var body:some View{NavigationStack{Form{Section("Server"){LabeledContent("URL",value:UserDefaults.standard.string(forKey:"serverURL") ?? "—");LabeledContent("Live connection",value:app.socket.connected ? "Connected":"Disconnected")};Section("Account"){LabeledContent("Username",value:app.user?.username ?? "—");LabeledContent("Role",value:app.user?.role.capitalized ?? "—")};Section("Application"){LabeledContent("Version",value:Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0");Button("Send test notification"){Task{try? await app.api.testPush()}};Button("Log Out",role:.destructive){Task{await app.logout()}}}}.navigationTitle("Settings")}}}
+

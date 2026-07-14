@@ -1,0 +1,3 @@
+import {lt}from"drizzle-orm";import{db}from"../database/client.js";import{metricSamples}from"../database/schema.js";import{config}from"../config/env.js";import{log}from"../shared/log.js";
+export function startMaintenance(){const run=async()=>{const cutoff=Date.now()-config.METRIC_RAW_RETENTION_HOURS*3600000;const result=await db.delete(metricSamples).where(lt(metricSamples.timestamp,cutoff));log.info({changes:result.changes},"metric retention cleanup complete");};const timer=setInterval(()=>void run().catch(error=>log.error({error},"retention cleanup failed")),3600000);timer.unref();return timer;}
+
