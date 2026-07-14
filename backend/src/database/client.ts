@@ -12,7 +12,7 @@ export const db = drizzle(sqlite, {schema});
 
 export function migrate(): void {
   sqlite.exec(`
-  CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,email TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,disabled INTEGER NOT NULL DEFAULT 0);
+  CREATE TABLE IF NOT EXISTS users(id TEXT PRIMARY KEY,username TEXT NOT NULL UNIQUE,email TEXT NOT NULL UNIQUE,password_hash TEXT NOT NULL,role TEXT NOT NULL,setup_completed INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL,disabled INTEGER NOT NULL DEFAULT 0);
   CREATE TABLE IF NOT EXISTS sessions(id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),refresh_token_hash TEXT NOT NULL,device_description TEXT,created_at INTEGER NOT NULL,expires_at INTEGER NOT NULL,revoked_at INTEGER,last_used_at INTEGER NOT NULL);
   CREATE TABLE IF NOT EXISTS servers(id TEXT PRIMARY KEY,name TEXT NOT NULL,hostname TEXT NOT NULL,operating_system TEXT NOT NULL,architecture TEXT NOT NULL,version TEXT NOT NULL,last_seen_at INTEGER,created_at INTEGER NOT NULL);
   CREATE TABLE IF NOT EXISTS metric_samples(id INTEGER PRIMARY KEY AUTOINCREMENT,server_id TEXT NOT NULL REFERENCES servers(id),timestamp INTEGER NOT NULL,resolution TEXT NOT NULL DEFAULT 'raw',cpu_percent REAL,per_core_json TEXT,load1 REAL,load5 REAL,load15 REAL,ram_total INTEGER,ram_used INTEGER,ram_available INTEGER,ram_percent REAL,swap_total INTEGER,swap_used INTEGER,disk_total INTEGER,disk_used INTEGER,disk_available INTEGER,disk_percent REAL,disk_read_bps REAL,disk_write_bps REAL,network_rx_bps REAL,network_tx_bps REAL,uptime REAL,process_count INTEGER,temperature REAL,boot_time INTEGER);
@@ -22,4 +22,8 @@ export function migrate(): void {
   CREATE INDEX IF NOT EXISTS alerts_status_idx ON alerts(status,triggered_at);
   CREATE TABLE IF NOT EXISTS push_devices(id TEXT PRIMARY KEY,user_id TEXT NOT NULL,token TEXT NOT NULL UNIQUE,environment TEXT NOT NULL,topic TEXT NOT NULL,device_name TEXT,last_seen_at INTEGER NOT NULL,enabled INTEGER NOT NULL DEFAULT 1);
   `);
+  const userColumns = sqlite.pragma("table_info(users)") as Array<{name:string}>;
+  if (!userColumns.some(column => column.name === "setup_completed")) {
+    sqlite.exec("ALTER TABLE users ADD COLUMN setup_completed INTEGER NOT NULL DEFAULT 0");
+  }
 }

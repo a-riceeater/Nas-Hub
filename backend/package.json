@@ -8,6 +8,7 @@
     "build": "next build && tsc -p tsconfig.server.json",
     "start": "NODE_ENV=production node dist/src/server.js",
     "create-admin": "tsx scripts/create-admin.ts",
+    "db:reset": "tsx scripts/reset-database.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json"

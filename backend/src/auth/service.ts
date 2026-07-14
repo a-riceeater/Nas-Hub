@@ -17,6 +17,14 @@ export class AuthService {
     const now=Date.now(), id=randomUUID();
     await db.insert(users).values({id,username:username.toLowerCase(),email:email.toLowerCase(),passwordHash:await this.hashPassword(password),role:"admin",createdAt:now,updatedAt:now}); return id;
   }
+  async updateAccount(userId:string,input:{username:string;email:string;currentPassword?:string;newPassword?:string}) {
+    const user=await db.query.users.findFirst({where:eq(users.id,userId)});if(!user)throw new Error("USER_NOT_FOUND");
+    if(input.newPassword&&(!input.currentPassword||!await verify(user.passwordHash,input.currentPassword)))throw new Error("CURRENT_PASSWORD_INVALID");
+    const values:{username:string;email:string;updatedAt:number;passwordHash?:string}={username:input.username.toLowerCase(),email:input.email.toLowerCase(),updatedAt:Date.now()};
+    if(input.newPassword)values.passwordHash=await this.hashPassword(input.newPassword);
+    await db.update(users).set(values).where(eq(users.id,userId));
+    if(input.newPassword)await db.update(sessions).set({revokedAt:Date.now()}).where(and(eq(sessions.userId,userId),isNull(sessions.revokedAt)));
+  }
   async login(identifier:string,password:string,device?:string):Promise<Tokens|null> {
     const normalized=identifier.toLowerCase();
     const user=await db.query.users.findFirst({where: and(or(eq(users.username,normalized),eq(users.email,normalized)),eq(users.disabled,false))});
@@ -40,4 +48,3 @@ export class AuthService {
   }
   async logout(token:string) { const [id]=token.split("."); if(id) await db.update(sessions).set({revokedAt:Date.now()}).where(eq(sessions.id,id)); }
 }
-

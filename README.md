@@ -16,6 +16,8 @@ npm run create-admin
 npm run dev
 ```
 
+`npm run create-admin` can also update an existing administrator. To erase all SQLite data—including accounts, metrics, and alerts—stop the server and run `npm run db:reset`; it requires typing `RESET`, after which you must run migrations and create an administrator again.
+
 Production: set `NODE_ENV=production`, use a strong secret, then run `npm run build && npm start`. Put the process behind Caddy or nginx with HTTPS/WebSocket forwarding; do not expose an HTTP login on the internet. SQLite data is written under `backend/data` by default.
 
 ## Run the iOS app
@@ -27,4 +29,3 @@ Production: set `NODE_ENV=production`, use a strong secret, then run `npm run bu
 5. For production, use an HTTPS URL and configure Push Notifications as described in [docs/push-notifications.md](docs/push-notifications.md).
 
 The server URL is remembered in preferences; credentials are stored only in Keychain. Current limitations include a single local server, raw history rather than materialized rollups, no web account session, and an APNs mock until Apple credentials are provided. The next recommended task is production APNs delivery plus one-minute/hourly metric rollups and fully downsampled history queries.
-
