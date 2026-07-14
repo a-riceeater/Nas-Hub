@@ -5,7 +5,7 @@ struct Tokens: Codable { let accessToken: String; let refreshToken: String; let 
 struct User: Codable { let id: String; let username: String; let email: String; let role: String; let setupCompleted: Bool }
 struct Server: Codable, Identifiable { let id: String; let name: String; let hostname: String; let lastSeenAt: Double? }
 struct Metric: Codable, Identifiable {
-    var id: Double { timestamp }; let timestamp: Double; let cpuPercent: Double?; let perCore: [Double]?
+    var id: Double { timestamp }; let timestamp: Double; let publicIPv4:String?;let cpuPercent: Double?;let systemUtilization:Double?; let perCore: [Double]?
     let load1, load5, load15: Double; let ramTotal, ramUsed, ramAvailable: Double; let ramPercent: Double
     let swapTotal, swapUsed, diskTotal, diskUsed, diskAvailable: Double; let diskPercent: Double?
     let diskReadBps, diskWriteBps, networkRxBps, networkTxBps: Double?; let uptime: Double
