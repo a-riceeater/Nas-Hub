@@ -12,6 +12,7 @@ struct SettingsView: View {
                     LabeledContent("Local", value: UserDefaults.standard.string(forKey: "localServerURL")?.nilIfEmpty ?? "Not configured")
                     LabeledContent("Public", value: UserDefaults.standard.string(forKey: "publicServerURL")?.nilIfEmpty ?? "Not configured")
                     LabeledContent("Live connection", value: app.socket.connected ? "Connected" : "Disconnected")
+                    if let reason=app.socket.lastDisconnectReason { LabeledContent("Last disconnect",value:reason) }
                     Button("Change server addresses") { showingConnections = true }
                 }
                 Section("Account") {
