@@ -29,4 +29,6 @@ export function migrate(): void {
   const metricColumns=sqlite.pragma("table_info(metric_samples)") as Array<{name:string}>;
   if(!metricColumns.some(column=>column.name==="public_ipv4"))sqlite.exec("ALTER TABLE metric_samples ADD COLUMN public_ipv4 TEXT");
   if(!metricColumns.some(column=>column.name==="system_utilization"))sqlite.exec("ALTER TABLE metric_samples ADD COLUMN system_utilization REAL");
+  if(!metricColumns.some(column=>column.name==="disk_busy_percent"))sqlite.exec("ALTER TABLE metric_samples ADD COLUMN disk_busy_percent REAL");
+  if(!metricColumns.some(column=>column.name==="disk_device_count"))sqlite.exec("ALTER TABLE metric_samples ADD COLUMN disk_device_count INTEGER NOT NULL DEFAULT 0");
 }

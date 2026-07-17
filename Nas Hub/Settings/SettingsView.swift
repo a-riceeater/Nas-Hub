@@ -4,6 +4,9 @@ struct SettingsView: View {
     @EnvironmentObject var app: AppState
     @State private var showingAccount = false
     @State private var showingConnections = false
+    #if PUSH_NOTIFICATIONS
+    @State private var pushResult:String?
+    #endif
 
     var body: some View {
         NavigationStack {
@@ -21,14 +24,22 @@ struct SettingsView: View {
                     Button("Change username or password") { showingAccount = true }
                 }
                 Section("Application") {
+                    #if PUSH_NOTIFICATIONS
+                    LabeledContent("Notifications",value:app.notificationPermission)
+                    #endif
                     LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
-                    Button("Send test notification") { Task { try? await app.api.testPush() } }
+                    #if PUSH_NOTIFICATIONS
+                    Button("Send test notification") { Task { pushResult=await app.sendTestPush() } }
+                    #endif
                     Button("Log Out", role: .destructive) { Task { await app.logout() } }
                 }
             }
             .navigationTitle("Settings")
             .sheet(isPresented: $showingAccount) { AccountEditorView() }
             .sheet(isPresented: $showingConnections) { ConnectionEditorView() }
+            #if PUSH_NOTIFICATIONS
+            .alert("Test notification",isPresented:Binding(get:{pushResult != nil},set:{if !$0{pushResult=nil}})){Button("OK"){pushResult=nil}}message:{Text(pushResult ?? "")}
+            #endif
         }
     }
 }

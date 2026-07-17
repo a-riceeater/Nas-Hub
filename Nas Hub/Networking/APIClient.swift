@@ -35,7 +35,10 @@ actor APIClient {
     func history(start: Date, maxPoints: Int = 300) async throws -> [Metric] { try await send("api/v1/servers/local/metrics/history?start=\(Int(start.timeIntervalSince1970*1000))&maxPoints=\(maxPoints)") }
     func alerts() async throws -> [AlertItem] { try await send("api/v1/alerts") }
     func acknowledge(_ id: String) async throws { let _: Ack = try await send("api/v1/alerts/\(id)/acknowledge", method: "POST", body: [String:String]()) }
-    func testPush() async throws { let _: Ack = try await send("api/v1/push/test", method: "POST", body: [String:String]()) }
+    #if PUSH_NOTIFICATIONS
+    func testPush() async throws -> PushTestResult { try await send("api/v1/push/test", method: "POST", body: [String:String]()) }
+    func registerPushToken(_ token:String) async throws {let _:DeviceRegistration=try await send("api/v1/push/devices",method:"POST",body:PushRegistration(token:token,environment:apnsEnvironment,topic:Bundle.main.bundleIdentifier ?? "com.ebantugan.Nas-Hub",deviceName:"iPhone"))}
+    #endif
     func logout() async { if let token = try? store.load()?.refreshToken { let _: Ack? = try? await send("api/v1/auth/logout", method: "POST", body: ["refreshToken":token], authenticated:false) }; try? store.clear() }
     func accessToken() throws -> String? { try store.load()?.accessToken }
 
@@ -82,6 +85,16 @@ actor APIClient {
 }
 
 private struct AccountUpdate: Encodable { let username,email:String;let currentPassword,newPassword:String? }
+#if PUSH_NOTIFICATIONS
+private struct PushRegistration:Encodable{let token,environment,topic,deviceName:String}
+private struct DeviceRegistration:Decodable{let id:String}
+struct PushTestResult:Decodable{let acknowledged:Bool;let sent,failed:Int;let provider:String}
+#if DEBUG
+private let apnsEnvironment="development"
+#else
+private let apnsEnvironment="production"
+#endif
+#endif
 private struct Ack: Codable { let acknowledged: Bool }
 private struct APIErrorEnvelope: Decodable { struct Detail:Decodable{let message:String};let error:Detail }
 enum APIError: LocalizedError { case invalidResponse,unauthorized,unreachable,server(Int,String);var errorDescription:String?{switch self{case .invalidResponse:return"Invalid server response";case .unauthorized:return"Please sign in again";case .unreachable:return"Neither server address could be reached";case .server(_,let message):return message}} }

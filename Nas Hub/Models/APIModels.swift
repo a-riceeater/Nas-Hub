@@ -7,7 +7,7 @@ struct Server: Codable, Identifiable { let id: String; let name: String; let hos
 struct Metric: Codable, Identifiable {
     var id: Double { timestamp }; let timestamp: Double; let publicIPv4:String?;let cpuPercent: Double?;let systemUtilization:Double?; let perCore: [Double]?
     let load1, load5, load15: Double; let ramTotal, ramUsed, ramAvailable: Double; let ramPercent: Double
-    let swapTotal, swapUsed, diskTotal, diskUsed, diskAvailable: Double; let diskPercent: Double?
+    let swapTotal, swapUsed, diskTotal, diskUsed, diskAvailable: Double; let diskPercent,diskBusyPercent: Double?;let diskDeviceCount:Int
     let diskReadBps, diskWriteBps, networkRxBps, networkTxBps: Double?; let uptime: Double
     let processCount: Int; let temperature: Double?; let bootTime: Double
 }

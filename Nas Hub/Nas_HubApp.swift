@@ -1,6 +1,8 @@
 import SwiftUI
 @main struct Nas_HubApp: App {
+    #if PUSH_NOTIFICATIONS
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    #endif
     @StateObject private var app = AppState()
     @Environment(\.scenePhase) private var scenePhase
     var body: some Scene {

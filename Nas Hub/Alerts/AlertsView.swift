@@ -3,13 +3,13 @@ import SwiftUI
 struct AlertsView: View {
     @EnvironmentObject var app: AppState
     var body: some View {
-        NavigationStack {
+        NavigationStack(path:$app.alertPath) {
             Group {
                 if app.alerts.isEmpty {
                     ContentUnavailableView("No alerts", systemImage: "checkmark.shield", description: Text("Your server has no alert history."))
                 } else {
                     List(app.alerts) { alert in
-                        NavigationLink { AlertDetail(alert: alert) } label: {
+                        NavigationLink(value:alert.id) {
                             HStack(alignment: .top) {
                                 Image(systemName: alert.status == "resolved" ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                                     .foregroundStyle(alert.severity == "critical" ? .red : .orange)
@@ -25,6 +25,7 @@ struct AlertsView: View {
             }
             .navigationTitle("Alerts")
             .refreshable { await app.refresh() }
+            .navigationDestination(for:String.self){id in if let alert=app.alerts.first(where:{$0.id==id}){AlertDetail(alert:alert)}else{ContentUnavailableView("Alert unavailable",systemImage:"exclamationmark.triangle")}}
         }
     }
 }
